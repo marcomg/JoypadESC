@@ -1,5 +1,5 @@
 # JoypadESC
-Attenction, this project for this time is only a backup for a test.
+Attenction, this project is only a test.
 
 ## Needed libraries:
 * stdlib;
