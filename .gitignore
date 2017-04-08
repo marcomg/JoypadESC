@@ -27,3 +27,12 @@
 *.exe
 *.out
 *.app
+
+.ino
+.ino.cpp
+.project
+.cproject
+.settings
+core/*
+libaries/*
+Release/*
