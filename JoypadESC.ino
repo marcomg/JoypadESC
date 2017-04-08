@@ -19,9 +19,13 @@
  * DEBUG MACROS *
  ****************/
 #if DEBUG == 1
-#define DEBUGPRINT(x) Serial.println(__LINE__); Serial.println(x)
+#define NDEBUGPRINT(x) Serial.println("Debug info line: "); Serial.println(__LINE__); Serial.println(" "); Serial.println(x)
+#define DEBUGPRINT(x) Serial.println(x)
+#define DEBUGNL() Serial.println('\n')
 #else
+#define NDEBUGPRINT(x)
 #define DEBUGPRINT(x)
+#define DEBUGNL()
 #endif
 
 /*****************
@@ -67,10 +71,10 @@ void setThrottle(float inThrottle) {
  *******************/
 void setup() {
     // Debug instrunctions
-#ifdef DEBUG
+#if DEBUG == 1
     Serial.begin(SERIAL_BAUD);
 #endif
-
+    NDEBUGPRINT("Button pressed, setting throttle to 0"); DEBUGNL();
     // Engine initialize
     engine.attach(ENGINE_PID);
     setThrottle(0);
@@ -86,11 +90,15 @@ void loop() {
     static unsigned long t2;
     t2 = millis();
 
+    NDEBUGPRINT("t1 is "); DEBUGPRINT(t1); DEBUGPRINT("and t2 is "); DEBUGPRINT(t2); DEBUGNL();
+
     // Button stop
     button.process();
     // if stop button is pressed set it to 0
     if (button.press()) {
+        NDEBUGPRINT("Button pressed, setting throttle to 0"); DEBUGNL();
         setThrottle(0);
+        DEBUGPRINT("Now throtte is "); DEBUGPRINT(throttle); DEBUGNL();
     }
 
     // Joypad change throttle
@@ -98,13 +106,18 @@ void loop() {
 
     // if i have to update throttle
     if ((t2 - t1) >= JOYPAD_UPDATE_TIME) {
-        throttle += joystick.dY * 0.02;
-
-        if ((int) throttle > 100)
+        NDEBUGPRINT("t2 - t1 > update_time, increasing throttle of "); DEBUGPRINT(joystick.dY * 0.002); DEBUGNL();
+        throttle += joystick.dY * 0.002;
+        if ((int) throttle > 100){
+            NDEBUGPRINT("Throttle is too hight, forcing it to max"); DEBUGNL();
             throttle = 100;
-        else if ((int) throttle < 0)
+        }
+        else if ((int) throttle < 0){
+            NDEBUGPRINT("Throttle is too low, forcing it to min"); DEBUGNL();
             throttle = 0;
+        }
 
+        NDEBUGPRINT("Updating throttle and t1"); DEBUGNL();
         setThrottle(throttle);
         t1 = millis();
     }
