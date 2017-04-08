@@ -19,9 +19,9 @@
  * DEBUG MACROS *
  ****************/
 #if DEBUG == 1
-    #define DEBUGPRINT(x) Serial.println(__LINE__); Serial.println(x)
+#define DEBUGPRINT(x) Serial.println(__LINE__); Serial.println(x)
 #else
-    #define DEBUGPRINT(x)
+#define DEBUGPRINT(x)
 #endif
 
 /*****************

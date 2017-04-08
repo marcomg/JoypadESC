@@ -1,12 +1,16 @@
 #ifndef MYLIBH
 #define MYLIBH
 
+float fmap(float x, float in_min, float in_max, float out_min, float out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 class Joystick {
     public:
         int xPin;
         int yPin;
-        int dX;
-        int dY;
+        float dX;
+        float dY;
 
         Joystick(int x, int y);
 
@@ -21,11 +25,11 @@ Joystick::Joystick(int x, int y) {
 }
 
 void Joystick::loop() {
-    int x = analogRead(xPin);
-    x = map(x, 0, 1023, 0, 100);
+    float x = analogRead(xPin);
+    x = fmap(x, 0, 1023, 0, 100);
 
-    int y = analogRead(xPin);
-    y = map(x, 0, 1023, 0, 100);
+    float y = analogRead(xPin);
+    y = fmap(x, 0, 1023, 0, 100);
 
     dX = x - 50;
     dY = y - 50;
