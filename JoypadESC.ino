@@ -1,19 +1,19 @@
 /****************
  * CODE OPTIONS *
  ****************/
-#define DEBUG 1
+#define DEBUG 0
 #define SERIAL_BAUD 9600
 
 // the pin where ESC's signal is put
-#define ENGINE_PID 6
+#define ENGINE_PID 2
 // delay for esc commands (in ms)
 #define ESC_DELAY 2000
 // the pid of the button
 #define JOYPAD_BUTTON_PID 8
 
-#define JOYPAD_XAXIS_PID 12
-#define JOYPAD_YAXIS_PID 13
-#define JOYPAD_UPDATE_TIME 40
+#define JOYPAD_XAXIS_PID A1
+#define JOYPAD_YAXIS_PID A0
+#define JOYPAD_UPDATE_TIME 20
 
 /****************
  * DEBUG MACROS *
@@ -74,7 +74,6 @@ void setup() {
 #if DEBUG == 1
     Serial.begin(SERIAL_BAUD);
 #endif
-    NDEBUGPRINT("Button pressed, setting throttle to 0"); DEBUGNL();
     // Engine initialize
     engine.attach(ENGINE_PID);
     setThrottle(0);
@@ -90,15 +89,14 @@ void loop() {
     static unsigned long t2;
     t2 = millis();
 
-    NDEBUGPRINT("t1 is "); DEBUGPRINT(t1); DEBUGPRINT("and t2 is "); DEBUGPRINT(t2); DEBUGNL();
-
     // Button stop
     button.process();
     // if stop button is pressed set it to 0
     if (button.press()) {
-        NDEBUGPRINT("Button pressed, setting throttle to 0"); DEBUGNL();
+        NDEBUGPRINT("Button pressed, setting throttle to 0");DEBUGNL();
         setThrottle(0);
-        DEBUGPRINT("Now throtte is "); DEBUGPRINT(throttle); DEBUGNL();
+        delay(ESC_DELAY);
+        DEBUGPRINT("Now throtte is ");DEBUGPRINT(throttle);DEBUGNL();
     }
 
     // Joypad change throttle
@@ -106,18 +104,17 @@ void loop() {
 
     // if i have to update throttle
     if ((t2 - t1) >= JOYPAD_UPDATE_TIME) {
-        NDEBUGPRINT("t2 - t1 > update_time, increasing throttle of "); DEBUGPRINT(joystick.dY * 0.002); DEBUGNL();
-        throttle += joystick.dY * 0.002;
-        if ((int) throttle > 100){
-            NDEBUGPRINT("Throttle is too hight, forcing it to max"); DEBUGNL();
+        // MAGIC NUMBER!!
+        throttle += joystick.dY * 0.06;
+        if ((int) throttle > 100) {
+            NDEBUGPRINT("Throttle is too hight, forcing it to max");DEBUGNL();
             throttle = 100;
         }
-        else if ((int) throttle < 0){
-            NDEBUGPRINT("Throttle is too low, forcing it to min"); DEBUGNL();
+        else if ((int) throttle < 0) {
+            NDEBUGPRINT("Throttle is too low, forcing it to min");DEBUGNL();
             throttle = 0;
         }
 
-        NDEBUGPRINT("Updating throttle and t1"); DEBUGNL();
         setThrottle(throttle);
         t1 = millis();
     }
