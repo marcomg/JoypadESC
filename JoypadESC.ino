@@ -8,12 +8,18 @@
 #define ENGINE_PID 2
 // delay for esc commands (in ms)
 #define ESC_DELAY 2000
+
+// Joypad
 // the pid of the button
 #define JOYPAD_BUTTON_PID 8
-
+// analogic input x axis joypad
 #define JOYPAD_XAXIS_PID A1
+// analogic input y axis joypad
 #define JOYPAD_YAXIS_PID A0
+// delay for updating input in ms
 #define JOYPAD_UPDATE_TIME 20
+// joypad multiplicative factor for d speed having dX or dY
+#define JOYPAD_MULTIPLICATIVE_FACTOR 0.06
 
 /****************
  * DEBUG MACROS *
@@ -39,10 +45,11 @@
  * GLOBAL VARIABLES *
  ********************/
 Servo engine; // my engine
-float throttle = 0; // throotle
-Button button(JOYPAD_BUTTON_PID, Button::INTERNAL_PULLUP);
+float throttle = 0; // throttle
 
-Joystick joystick(JOYPAD_XAXIS_PID, JOYPAD_YAXIS_PID);
+Button button(JOYPAD_BUTTON_PID, Button::INTERNAL_PULLUP); // button manager
+
+Joystick joystick(JOYPAD_XAXIS_PID, JOYPAD_YAXIS_PID); // joystick manager
 
 /*******************
  *   FUNCTIONS     *
@@ -60,6 +67,7 @@ int conv100To180(int speed) {
 /*
  * input int throttle (the throttle of motor from 0 to 100%)
  * output none
+ * control throttle
  */
 void setThrottle(float inThrottle) {
     engine.write(conv100To180((int) inThrottle));
@@ -91,7 +99,7 @@ void loop() {
 
     // Button stop
     button.process();
-    // if stop button is pressed set it to 0
+    // if stop button is pressed set throttle to 0
     if (button.press()) {
         NDEBUGPRINT("Button pressed, setting throttle to 0");DEBUGNL();
         setThrottle(0);
@@ -105,7 +113,7 @@ void loop() {
     // if i have to update throttle
     if ((t2 - t1) >= JOYPAD_UPDATE_TIME) {
         // MAGIC NUMBER!!
-        throttle += joystick.dY * 0.06;
+        throttle += joystick.dY * JOYPAD_MULTIPLICATIVE_FACTOR;
         if ((int) throttle > 100) {
             NDEBUGPRINT("Throttle is too hight, forcing it to max");DEBUGNL();
             throttle = 100;
