@@ -19,19 +19,25 @@
 // delay for updating input in ms
 #define JOYPAD_UPDATE_TIME 20
 // joypad multiplicative factor for d speed having dX or dY
-#define JOYPAD_MULTIPLICATIVE_FACTOR 0.06
+#define JOYPAD_MULTIPLICATIVE_FACTOR 0.02
 
 /****************
  * DEBUG MACROS *
  ****************/
 #if DEBUG == 1
-#define NDEBUGPRINT(x) Serial.println("Debug info line: "); Serial.println(__LINE__); Serial.println(" "); Serial.println(x)
+#define NDEBUGPRINT(x) Serial.print(millis()); \
+    Serial.print(": "); \
+    Serial.print(__PRETTY_FUNCTION__); \
+    Serial.print(' '); \
+    Serial.print(__FILE__); \
+    Serial.print(':'); \
+    Serial.print(__LINE__); \
+    Serial.print(' '); \
+    Serial.println(x)
 #define DEBUGPRINT(x) Serial.println(x)
-#define DEBUGNL() Serial.println('\n')
 #else
 #define NDEBUGPRINT(x)
 #define DEBUGPRINT(x)
-#define DEBUGNL()
 #endif
 
 /*****************
@@ -101,25 +107,29 @@ void loop() {
     button.process();
     // if stop button is pressed set throttle to 0
     if (button.press()) {
-        NDEBUGPRINT("Button pressed, setting throttle to 0");DEBUGNL();
+        NDEBUGPRINT("Button pressed, setting throttle to 0");
         setThrottle(0);
         delay(ESC_DELAY);
-        DEBUGPRINT("Now throtte is ");DEBUGPRINT(throttle);DEBUGNL();
+        DEBUGPRINT("Now throtte is " + (String) throttle);
     }
 
     // Joypad change throttle
     joystick.loop();
 
+    //DEBUGPRINT("Throttle: " + (String) throttle);
+    //DEBUGPRINT("Degrees: " + (String) conv100To180(throttle));
+
     // if i have to update throttle
     if ((t2 - t1) >= JOYPAD_UPDATE_TIME) {
         // MAGIC NUMBER!!
         throttle += joystick.dY * JOYPAD_MULTIPLICATIVE_FACTOR;
+        //NDEBUGPRINT(joystick.dY);
         if ((int) throttle > 100) {
-            NDEBUGPRINT("Throttle is too hight, forcing it to max");DEBUGNL();
+            NDEBUGPRINT("Throttle is too hight, forcing it to max");
             throttle = 100;
         }
         else if ((int) throttle < 0) {
-            NDEBUGPRINT("Throttle is too low, forcing it to min");DEBUGNL();
+            NDEBUGPRINT("Throttle is too low, forcing it to min");
             throttle = 0;
         }
 

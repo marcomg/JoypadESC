@@ -26,17 +26,17 @@ Joystick::Joystick(int x, int y) {
 
 void Joystick::loop() {
     float x = analogRead(xPin);
-    x = fmap(x, 0, 1023, 0, 100);
+    x = fmap(x, 0, 1023, 0, 200);
 
     float y = analogRead(yPin);
-    y = fmap(y, 0, 1023, 0, 100);
+    y = fmap(y, 0, 1023, 0, 200);
 
-    dX = -(x - 50);
-    dY = -(y - 50);
+    dX = -(x - 100);
+    dY = -(y - 100);
 
     // Setting a game for the input
-    dX = (dX >= -1 && dX <= 1) ? 0 : dX;
-    dY = (dY >= -1 && dY <= 1) ? 0 : dY;
+    dX = (dX >= -1.5 && dX <= 1.5) ? 0 : dX;
+    dY = (dY >= -1.5 && dY <= 1.5) ? 0 : dY;
 
 }
 
